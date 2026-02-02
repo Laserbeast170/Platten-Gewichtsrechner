@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
   <title>Platten-Gewichtsrechner | Nowoline</title>
   <style>
     :root {
@@ -15,7 +15,6 @@
       display: flex; flex-direction: column; min-height: 100vh;
     }
     .wrap { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; flex: 1; }
-    
     .brand-header { text-align: left; margin-bottom: 2rem; }
     .brand-header h1 { font-size: 2.2rem; margin: 0; color: white; letter-spacing: -1px; }
 
@@ -44,58 +43,63 @@
     }
     .btn.ok { background: var(--success); border-color: var(--success); color: white; }
 
-    .table-container { width: 100%; margin-bottom: 2rem; }
     table { width: 100%; border-collapse: collapse; }
     th { background: rgba(15, 23, 42, 0.5); padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--mut); text-transform: uppercase; text-align: left; }
-    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
+    td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
     
     input, select, textarea {
       background: #0f172a; border: 1px solid var(--border); color: white;
       padding: 0.6rem; border-radius: 6px; width: 100%; box-sizing: border-box;
     }
-    input[type=number] { -moz-appearance: textfield; }
-    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    
-    .rowgrid { display: flex; gap: 0.5rem; }
-    .rowgrid input { flex: 1; min-width: 60px; }
 
-    .weight-cell { text-align: right; font-weight: bold; color: var(--accent); font-size: 1.1rem; }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    optgroup { background: #1e293b; color: #facc15; font-style: normal; font-weight: bold; }
+    option { background: #0f172a; color: white; font-weight: normal; }
+
+    .mat-col { display: flex; flex-direction: column; gap: 6px; }
+    .mat-select-box { display: flex; align-items: center; gap: 4px; }
+    .search-input { font-size: 0.75rem; padding: 4px 8px; border-style: dashed; opacity: 0.8; margin-top: 2px; }
+    
+    .fav-btn { background:none; border:none; color:var(--mut); cursor:pointer; font-size: 1.2rem; padding:0; line-height: 1; }
+    .fav-btn.active { color: #facc15; }
+
+    .rowgrid { display: flex; gap: 0.5rem; }
+    .rowgrid div { display: flex; flex-direction: column; flex: 1; }
+    .field-label { font-size: 0.6rem; color: var(--mut); text-transform: uppercase; margin-top: 4px; font-weight: bold; }
+
+    .weight-cell { text-align: right; font-weight: bold; color: var(--accent); font-size: 1.2rem; padding-top: 1.5rem !important; }
 
     footer {
-      text-align: center; padding: 2rem; color: var(--mut); font-size: 0.85rem;
+      text-align: center; padding: 2rem; color: var(--mut); font-size: 0.8rem;
       border-top: 1px solid var(--border); margin-top: auto;
+    }
+
+    @media print {
+      body { background: white !important; color: black !important; }
+      .sticky-sum, .search-input, .fav-btn, .btn, td:last-child, th:last-child { display: none !important; }
+      .title-input { border-left: 4px solid #333 !important; color: black !important; }
+      input, select { background: transparent !important; color: black !important; border: none !important; appearance: none; }
+      .weight-cell { color: black !important; }
+      .brand-header::after { content: "Gesamtgewicht: " attr(data-total); display: block; font-weight: bold; margin-top: 10px; }
+      footer { border-top: 1px solid #ddd !important; color: #666 !important; position: relative; margin-top: 50px; }
     }
 
     @media (max-width: 950px) {
       table, thead, tbody, th, td, tr { display: block; }
       thead { display: none; }
       tr { background: var(--card); border: 1px solid var(--border); margin-bottom: 1.5rem; border-radius: 12px; padding: 1rem; }
-      td { border: none; padding: 0.4rem 0; width: 100% !important; display: flex; flex-direction: column; }
+      td { border: none; padding: 0.4rem 0 !important; width: 100% !important; display: flex; flex-direction: column; }
       td::before { content: attr(data-label); font-size: 0.7rem; color: var(--mut); text-transform: uppercase; margin-bottom: 0.2rem; }
-      .rowgrid { flex-wrap: wrap; }
-      .weight-cell { text-align: left; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+      .weight-cell { text-align: left; margin-top: 0.5rem; padding-top: 0.5rem !important; border-top: 1px solid var(--border); }
     }
-
-    @media print {
-      .sticky-sum, .btn, td:last-child { display: none !important; }
-      body { background: white; color: black; }
-      footer { border-top: 1px solid #000; color: black; margin-top: 2rem; }
-      .title-input { border-left: 4px solid black; color: black; }
-      input, select, textarea { border: none; color: black; background: transparent; appearance: none; }
-      .weight-cell { color: black; }
-}
   </style>
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0f172a">
-  <meta name="robots" content="noindex">
 </head>
 <body>
 <div class="wrap">
-  <div class="brand-header">
-    <h1>Platten-Gewichtsrechner</h1>
-  </div>
+  <div class="brand-header" id="printHeader"><h1>Platten-Gewichtsrechner</h1></div>
 
   <div class="project-info">
     <input type="text" id="projectTitle" class="title-input" placeholder="Projekt Name..." oninput="updateMeta()">
@@ -115,22 +119,20 @@
     </div>
   </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:20%">Material</th>
-          <th style="width:15%">Form</th>
-          <th style="width:30%">Eingabe (Maße in mm)</th>
-          <th style="width:12%">Dichte</th>
-          <th style="width:8%">Stk</th>
-          <th style="width:15%; text-align:right">Gewicht</th>
-          <th style="width:40px"></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:25%">Material</th>
+        <th style="width:15%">Form</th>
+        <th style="width:30%">Maße (mm)</th>
+        <th style="width:12%">Dichte</th>
+        <th style="width:8%">Stk</th>
+        <th style="width:10%; text-align:right">Gewicht</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
 
 <footer>
@@ -139,26 +141,67 @@
 
 <script>
 (() => {
-  const MATERIALS_DB = [
-    { name: "Spanplatte roh", density: 650 }, { name: "MDF", density: 750 },
-    { name: "Multiplex (Birke)", density: 680 }, { name: "OSB", density: 600 },
-    { name: "Glas (Float)", density: 2500 }, { name: "Acrylglas (PMMA)", density: 1180 },
-    { name: "Stahl", density: 7850 }, { name: "Aluminium", density: 2700 },
-    { name: "Beton", density: 2400 }, { name: "Naturstein (Granit)", density: 2700 },
-    { name: "Massivholz Fichte", density: 470 }, { name: "Massivholz Eiche", density: 720 }
-  ].sort((a,b) => a.name.localeCompare(b.name));
+  const MATERIALS_DB = {
+    "Massivholz": [
+      { name: "Massivholz (Buche)", density: 700 },
+      { name: "Massivholz (Eiche)", density: 720 },
+      { name: "Massivholz (Esche)", density: 700 },
+      { name: "Massivholz (Fichte)", density: 470 },
+      { name: "Massivholz (Nussbaum)", density: 640 },
+      { name: "Massivholz (Tanne)", density: 480 },
+      { name: "Massivholz (Tulipwood)", density: 450 }
+    ],
+    "Plattenwerkstoffe": [
+      { name: "Fermacell", density: 1150 },
+      { name: "Gipsplatte (Rigips)", density: 850 },
+      { name: "HDF", density: 850 },
+      { name: "HPL", density: 1350 },
+      { name: "Kompaktplatte", density: 1450 },
+      { name: "MDF", density: 750 },
+      { name: "OSB", density: 650 },
+      { name: "Pappelspan", density: 450 },
+      { name: "Spanplatte roh", density: 650 },
+      { name: "Sperrholz / Multiplex", density: 680 },
+      { name: "Tischlerplatte", density: 500 }
+    ],
+    "Metall": [
+      { name: "Metall: Aluminium", density: 2700 },
+      { name: "Metall: Blei", density: 11340 },
+      { name: "Metall: Edelstahl", density: 8000 },
+      { name: "Metall: Kupfer", density: 8960 },
+      { name: "Metall: Messing", density: 8500 },
+      { name: "Metall: Stahl", density: 7850 }
+    ],
+    "Sonstiges": [
+      { name: "Acrylglas (Plexi)", density: 1180 },
+      { name: "Alu-Verbund (Dibond)", density: 3500 },
+      { name: "Beton", density: 2400 },
+      { name: "Corian", density: 1750 },
+      { name: "Glas (Float)", density: 2500 },
+      { name: "PVC-Hartschaum", density: 600 }
+    ]
+  };
 
-  let state = { title: "", notes: "", rows: [] };
+  const getFlatMat = (name) => {
+    for (let cat in MATERIALS_DB) {
+      const found = MATERIALS_DB[cat].find(m => m.name === name);
+      if (found) return found;
+    }
+    return { name: name, density: 0 };
+  };
 
-  const createDefaultRow = () => ({
+  let state = JSON.parse(localStorage.getItem('nowoline_final_pro')) || { title: "", notes: "", rows: [], favs: [] };
+  const save = () => localStorage.setItem('nowoline_final_pro', JSON.stringify(state));
+
+  const createRow = () => ({
     id: Math.random().toString(36).substr(2, 9),
-    mat: "Spanplatte roh", mode: "dims", l: "", b: "", d: "", area: "", dia: "", idia: "", densOver: "", qty: 1
+    mat: "Spanplatte roh", mode: "dims", l: "", b: "", d: "", area: "", dia: "", idia: "", densOver: "", qty: 1, search: ""
   });
 
   const calcWeight = (r) => {
     const val = (v) => parseFloat(v) || 0;
     const mmM = (v) => val(v) / 1000;
-    const dens = val(r.densOver) || MATERIALS_DB.find(m => m.name === r.mat)?.density || 0;
+    const dens = val(r.densOver) || getFlatMat(r.mat).density || 0;
     let vol = 0;
     if (r.mode === "dims") vol = mmM(r.l) * mmM(r.b) * mmM(r.d);
     else if (r.mode === "area") vol = val(r.area) * mmM(r.d);
@@ -167,38 +210,63 @@
     return vol * dens * val(r.qty);
   };
 
-  const updateGlobalSum = () => {
+  const updateTotal = () => {
     const total = state.rows.reduce((sum, r) => sum + calcWeight(r), 0);
-    document.getElementById("totalKg").textContent = total.toLocaleString('de-DE', {minimumFractionDigits:2}) + " kg";
+    const txt = total.toLocaleString('de-DE', {minimumFractionDigits:2}) + " kg";
+    document.getElementById("totalKg").textContent = txt;
+    document.getElementById("printHeader").setAttribute('data-total', txt);
   };
 
-  const save = () => localStorage.setItem('nowoline_calc_v_final_stable', JSON.stringify(state));
-
-  window.updateMeta = () => {
-    state.title = document.getElementById("projectTitle").value;
-    state.notes = document.getElementById("projectNotes").value;
-    save();
+  window.toggleFav = (mat) => {
+    state.favs = state.favs.includes(mat) ? state.favs.filter(f => f !== mat) : [...state.favs, mat];
+    save(); fullRender();
   };
 
-  window.updateVal = (id, key, val) => {
-    const idx = state.rows.findIndex(r => r.id === id);
-    if (idx === -1) return;
+  const renderOptions = (r) => {
+    let html = "";
+    const searchVal = (r.search || "").toLowerCase();
 
-    // Fix: Bei Moduswechsel Werte säubern
-    if (key === 'mode') {
-        state.rows[idx].l = ""; state.rows[idx].b = ""; state.rows[idx].d = "";
-        state.rows[idx].area = ""; state.rows[idx].dia = ""; state.rows[idx].idia = "";
+    const favItems = [];
+    for (let cat in MATERIALS_DB) {
+        MATERIALS_DB[cat].forEach(m => {
+            if(state.favs.includes(m.name) && m.name.toLowerCase().includes(searchVal)) {
+                favItems.push(m);
+            }
+        });
+    }
+    if (favItems.length > 0) {
+        html += `<optgroup label="★ MEINE FAVORITEN">`;
+        favItems.sort((a,b) => a.name.localeCompare(b.name)).forEach(m => {
+            html += `<option value="${m.name}" ${r.mat === m.name ? 'selected' : ''}>★ ${m.name}</option>`;
+        });
+        html += `</optgroup>`;
     }
 
-    state.rows[idx][key] = val;
-    
-    // UI sofort aktualisieren
-    if (key === 'mode' || key === 'mat') {
-        fullRender();
+    for (const [group, items] of Object.entries(MATERIALS_DB)) {
+      const filtered = items.filter(m => m.name.toLowerCase().includes(searchVal))
+                            .sort((a,b) => a.name.localeCompare(b.name));
+      if (filtered.length > 0) {
+        html += `<optgroup label="${group.toUpperCase()}">`;
+        filtered.forEach(m => {
+          html += `<option value="${m.name}" ${r.mat === m.name ? 'selected' : ''}>${m.name}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+    }
+    return html;
+  };
+
+  window.upd = (id, key, val) => {
+    const r = state.rows.find(x => x.id === id);
+    if (!r) return;
+    r[key] = val;
+    if (key === 'mode' || key === 'mat') fullRender();
+    else if (key === 'search') {
+      document.getElementById(`sel-${id}`).innerHTML = renderOptions(r);
     } else {
-        const weightCell = document.getElementById(`weight-${id}`);
-        if (weightCell) weightCell.textContent = calcWeight(state.rows[idx]).toLocaleString('de-DE', {minimumFractionDigits:2}) + " kg";
-        updateGlobalSum();
+      const wEl = document.getElementById(`weight-${id}`);
+      if(wEl) wEl.textContent = calcWeight(r).toLocaleString('de-DE', {minimumFractionDigits:2}) + " kg";
+      updateTotal();
     }
     save();
   };
@@ -208,64 +276,86 @@
     document.getElementById("projectNotes").value = state.notes || "";
     const tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
-    state.rows.forEach((r) => {
+    
+    state.rows.forEach(r => {
+      const isFav = state.favs.includes(r.mat);
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td data-label="Material"><select onchange="updateVal('${r.id}', 'mat', this.value)">${MATERIALS_DB.map(m => `<option ${r.mat === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}</select></td>
-        <td data-label="Form"><select onchange="updateVal('${r.id}', 'mode', this.value)">
-          <option value="dims" ${r.mode==='dims'?'selected':''}>Rechteck</option>
-          <option value="area" ${r.mode==='area'?'selected':''}>Fläche (m²)</option>
-          <option value="cyl" ${r.mode==='cyl'?'selected':''}>Rundstab</option>
-          <option value="tube" ${r.mode==='tube'?'selected':''}>Rohr</option>
-        </select></td>
-        <td data-label="Eingabe"><div class="rowgrid">
-          ${r.mode === 'dims' ? `
-            <input type="number" value="${r.l}" oninput="updateVal('${r.id}', 'l', this.value)" placeholder="L (mm)">
-            <input type="number" value="${r.b}" oninput="updateVal('${r.id}', 'b', this.value)" placeholder="B (mm)">
-            <input type="number" value="${r.d}" oninput="updateVal('${r.id}', 'd', this.value)" placeholder="D (mm)">` : 
-            r.mode === 'area' ? `
-            <input type="number" value="${r.area}" oninput="updateVal('${r.id}', 'area', this.value)" placeholder="Fläche m²">
-            <input type="number" value="${r.d}" oninput="updateVal('${r.id}', 'd', this.value)" placeholder="Dicke mm">` : 
-            r.mode === 'cyl' ? `
-            <input type="number" value="${r.dia}" oninput="updateVal('${r.id}', 'dia', this.value)" placeholder="Ø (mm)">
-            <input type="number" value="${r.l}" oninput="updateVal('${r.id}', 'l', this.value)" placeholder="Länge (mm)">` : `
-            <input type="number" value="${r.dia}" oninput="updateVal('${r.id}', 'dia', this.value)" placeholder="Ø Aussen">
-            <input type="number" value="${r.idia}" oninput="updateVal('${r.id}', 'idia', this.value)" placeholder="Ø Innen">
-            <input type="number" value="${r.l}" oninput="updateVal('${r.id}', 'l', this.value)" placeholder="Länge">`}
+        <td data-label="Material">
+          <div class="mat-col">
+            <div class="mat-select-box">
+              <button class="fav-btn ${isFav?'active':''}" onclick="toggleFav('${r.mat}')">${isFav?'★':'☆'}</button>
+              <select id="sel-${r.id}" onchange="upd('${r.id}', 'mat', this.value)">${renderOptions(r)}</select>
+            </div>
+            <input type="text" class="search-input no-print" placeholder="🔍 Suchen..." value="${r.search||''}" oninput="upd('${r.id}', 'search', this.value)">
+            <span class="field-label">Kategorie & Material</span>
+          </div>
+        </td>
+        <td data-label="Form">
+          <select onchange="upd('${r.id}', 'mode', this.value)">
+            <option value="dims" ${r.mode==='dims'?'selected':''}>Rechteck</option>
+            <option value="area" ${r.mode==='area'?'selected':''}>Fläche</option>
+            <option value="cyl" ${r.mode==='cyl'?'selected':''}>Rundstab</option>
+            <option value="tube" ${r.mode==='tube'?'selected':''}>Rohr</option>
+          </select>
+          <span class="field-label">Typ</span>
+        </td>
+        <td data-label="Maße"><div class="rowgrid">
+          ${r.mode==='dims'? `<div><input type="number" value="${r.l}" oninput="upd('${r.id}','l',this.value)"><span class="field-label">L (mm)</span></div>
+                             <div><input type="number" value="${r.b}" oninput="upd('${r.id}','b',this.value)"><span class="field-label">B (mm)</span></div>
+                             <div><input type="number" value="${r.d}" oninput="upd('${r.id}','d',this.value)"><span class="field-label">D (mm)</span></div>` :
+            r.mode==='area'? `<div><input type="number" value="${r.area}" oninput="upd('${r.id}','area',this.value)"><span class="field-label">m²</span></div>
+                             <div><input type="number" value="${r.d}" oninput="upd('${r.id}','d',this.value)"><span class="field-label">D (mm)</span></div>` :
+            r.mode==='cyl'?  `<div><input type="number" value="${r.dia}" oninput="upd('${r.id}','dia',this.value)"><span class="field-label">Ø (mm)</span></div>
+                             <div><input type="number" value="${r.l}" oninput="upd('${r.id}','l',this.value)"><span class="field-label">L (mm)</span></div>` :
+                             `<div><input type="number" value="${r.dia}" oninput="upd('${r.id}','dia',this.value)"><span class="field-label">Ø A</span></div>
+                             <div><input type="number" value="${r.idia}" oninput="upd('${r.id}','idia',this.value)"><span class="field-label">Ø I</span></div>
+                             <div><input type="number" value="${r.l}" oninput="upd('${r.id}','l',this.value)"><span class="field-label">L (mm)</span></div>`}
         </div></td>
-        <td data-label="Dichte"><input type="number" value="${r.densOver}" placeholder="${MATERIALS_DB.find(m=>m.name===r.mat).density}" oninput="updateVal('${r.id}', 'densOver', this.value)"></td>
-        <td data-label="Stk"><input type="number" value="${r.qty}" oninput="updateVal('${r.id}', 'qty', this.value)"></td>
+        <td data-label="Dichte">
+          <input type="number" value="${r.densOver}" placeholder="${getFlatMat(r.mat).density}" oninput="upd('${r.id}', 'densOver', this.value)">
+          <span class="field-label">kg/m³</span>
+        </td>
+        <td data-label="Stk">
+          <input type="number" value="${r.qty}" oninput="upd('${r.id}', 'qty', this.value)">
+          <span class="field-label">Stück</span>
+        </td>
         <td data-label="Gewicht" class="weight-cell" id="weight-${r.id}">${calcWeight(r).toLocaleString('de-DE', {minimumFractionDigits:2})} kg</td>
-        <td><button onclick="removeRow('${r.id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.2rem">✕</button></td>
+        <td class="no-print" style="padding-top:1.5rem !important;"><button onclick="removeRow('${r.id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.2rem;">✕</button></td>
       `;
       tbody.appendChild(tr);
     });
-    updateGlobalSum();
+    updateTotal();
   };
 
-  window.removeRow = (id) => {
-    state.rows = state.rows.filter(r => r.id !== id);
-    if(state.rows.length === 0) state.rows.push(createDefaultRow());
-    fullRender(); save();
-  };
-
-  document.getElementById("btnAdd").onclick = () => { state.rows.push(createDefaultRow()); fullRender(); save(); };
-  document.getElementById("btnReset").onclick = () => { if(confirm("Projekt komplett löschen?")) { state = { title: "", notes: "", rows: [createDefaultRow()] }; fullRender(); save(); } };
-
+  window.removeRow = (id) => { state.rows = state.rows.filter(r => r.id !== id); if(!state.rows.length) state.rows.push(createRow()); fullRender(); save(); };
+  window.updateMeta = () => { state.title = document.getElementById("projectTitle").value; state.notes = document.getElementById("projectNotes").value; save(); };
+  document.getElementById("btnAdd").onclick = () => { state.rows.push(createRow()); fullRender(); save(); };
+  document.getElementById("btnReset").onclick = () => { if(confirm("Löschen?")) { state.rows = [createRow()]; state.title=""; state.notes=""; fullRender(); save(); } };
+  
   document.getElementById("btnExportTxt").onclick = () => {
-    let t = `PLATTEN-GEWICHTSRECHNER\n`;
-    t += `PROJEKT: ${state.title || 'Unbenannt'}\n\n`;
-    state.rows.forEach((r, i) => t += `POS ${i+1}: ${r.mat} | ${calcWeight(r).toLocaleString('de-DE', {minimumFractionDigits:2})} kg\n`);
-    t += `\nGESAMTGEWICHT: ${document.getElementById("totalKg").textContent}\n\nPlatten-Gewichtsrechner 2.0 | Sponsored by Nowoline GmbH | Alle Angaben ohne Gewähr`;
+    let t = `PROJEKT: ${state.title || 'Unbenannt'}\n`;
+    t += `NOTIZEN: ${state.notes || '-'}\n`;
+    t += `${"-".repeat(60)}\n`;
+    state.rows.forEach((r, i) => {
+        let m = "";
+        if(r.mode==='dims') m = `${r.l}x${r.b}x${r.d}mm`;
+        else if(r.mode==='area') m = `${r.area}m2 x ${r.d}mm`;
+        else if(r.mode==='cyl') m = `Ø${r.dia} x ${r.l}mm`;
+        else m = `ØA${r.dia}/ØI${r.idia} x ${r.l}mm`;
+
+        t += `POS ${String(i+1).padStart(2,'0')}: ${r.mat.padEnd(25)} | ${m.padEnd(18)} | ${r.qty} Stk | ${calcWeight(r).toLocaleString('de-DE', {minimumFractionDigits:2})} kg\n`;
+    });
+    t += `${"-".repeat(60)}\n`;
+    t += `GESAMTGEWICHT: ${document.getElementById("totalKg").textContent}\n\n`;
+    t += `Platten-Gewichtsrechner 2.0 | Sponsored by Nowoline GmbH\n`;
+    t += `Alle Angaben ohne Gewähr.`;
+    
     const b = new Blob([t], {type : 'text/plain'});
-    const a = document.createElement('a');
-    a.href = window.URL.createObjectURL(b);
-    a.download = `Gewicht_Export.txt`; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `Gewichtskalkulation.txt`; a.click();
   };
 
-  const saved = localStorage.getItem('nowoline_calc_v_final_stable');
-  if (saved) state = JSON.parse(saved);
-  else state.rows = [createDefaultRow()];
+  if (!state.rows.length) state.rows.push(createRow());
   fullRender();
 })();
 </script>
