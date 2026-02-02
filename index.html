@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Platten-Gewichtsrechner | Nowoline</title>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --accent: #38bdf8;
+      --success: #10b981; --danger: #f43f5e; --mut: #94a3b8; --border: #334155;
+    }
+    body {
+      margin: 0; font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg); color: #f1f5f9; line-height: 1.5;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    .wrap { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; flex: 1; }
+    
+    .brand-header { text-align: left; margin-bottom: 2rem; }
+    .brand-header h1 { font-size: 2.2rem; margin: 0; color: white; letter-spacing: -1px; }
+
+    .project-info { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .title-input { 
+        font-size: 1.3rem; font-weight: bold; background: transparent; 
+        border: none; border-left: 4px solid var(--accent); color: white; padding: 0.5rem 1rem;
+    }
+    .title-input:focus { outline: none; background: rgba(56, 189, 248, 0.05); }
+    .info-input { background: var(--card); border: 1px solid var(--border); color: #cbd5e1; padding: 0.75rem; border-radius: 8px; resize: vertical; min-height: 60px; }
+
+    .sticky-sum {
+      position: sticky; top: 1rem; z-index: 100;
+      background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(12px);
+      border: 1px solid var(--accent); border-radius: 12px;
+      padding: 1.25rem; margin-bottom: 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .total-val { font-size: 1.75rem; font-weight: 800; color: var(--accent); }
+    
+    .btn {
+      background: var(--card); border: 1px solid var(--border); color: #f1f5f9;
+      padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 500;
+      font-size: 0.875rem; transition: 0.2s;
+    }
+    .btn.ok { background: var(--success); border-color: var(--success); color: white; }
+
+    .table-container { width: 100%; margin-bottom: 2rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: rgba(15, 23, 42, 0.5); padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--mut); text-transform: uppercase; text-align: left; }
+    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
+    
+    input, select, textarea {
+      background: #0f172a; border: 1px solid var(--border); color: white;
+      padding: 0.6rem; border-radius: 6px; width: 100%; box-sizing: border-box;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    
+    .rowgrid { display: flex; gap: 0.5rem; }
+    .rowgrid input { flex: 1; min-width: 60px; }
+
+    .weight-cell { text-align: right; font-weight: bold; color: var(--accent); font-size: 1.1rem; }
+
+    footer {
+      text-align: center; padding: 2rem; color: var(--mut); font-size: 0.85rem;
+      border-top: 1px solid var(--border); margin-top: auto;
+    }
+
+    @media (max-width: 950px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr { background: var(--card); border: 1px solid var(--border); margin-bottom: 1.5rem; border-radius: 12px; padding: 1rem; }
+      td { border: none; padding: 0.4rem 0; width: 100% !important; display: flex; flex-direction: column; }
+      td::before { content: attr(data-label); font-size: 0.7rem; color: var(--mut); text-transform: uppercase; margin-bottom: 0.2rem; }
+      .rowgrid { flex-wrap: wrap; }
+      .weight-cell { text-align: left; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+    }
+
+    @media print {
+      .sticky-sum, .btn, td:last-child { display: none !important; }
+      body { background: white; color: black; }
+      footer { border-top: 1px solid #000; color: black; margin-top: 2rem; }
+      .title-input { border-left: 4px solid black; color: black; }
+      input, select, textarea { border: none; color: black; background: transparent; appearance: none; }
+      .weight-cell { color: black; }
+    }
+  </style>
+<meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+<div class="wrap">
+  <div class="brand-header">
+    <h1>Platten-Gewichtsrechner</h1>
+  </div>
+
+  <div class="project-info">
+    <input type="text" id="projectTitle" class="title-input" placeholder="Projekt Name..." oninput="updateMeta()">
+    <textarea id="projectNotes" class="info-input" placeholder="Bemerkungen..." oninput="updateMeta()"></textarea>
+  </div>
+
+  <div class="sticky-sum">
+    <div>
+      <div style="font-size:0.75rem; text-transform:uppercase; color:var(--mut)">Gesamtgewicht</div>
+      <div class="total-val" id="totalKg">0,00 kg</div>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
+      <button class="btn ok" id="btnAdd">+ Zeile</button>
+      <button class="btn" onclick="window.print()">🖨️ PDF</button>
+      <button class="btn" id="btnExportTxt">📄 TXT</button>
+      <button class="btn" id="btnReset" style="border-color:var(--danger); color:var(--danger)">Reset</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:20%">Material</th>
+          <th style="width:15%">Form</th>
+          <th style="width:30%">Eingabe (Maße in mm)</th>
+          <th style="width:12%">Dichte</th>
+          <th style="width:8%">Stk</th>
+          <th style="width:15%; text-align:right">Gewicht</th>
+          <th style="width:40px"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  Platten-Gewichtsrechner 2.0 | Sponsored by Nowoline GmbH | Alle Angaben ohne Gewähr
+</footer>
+
+<script>
+(() => {
+  const MATERIALS_DB = [
+    { name: "Spanplatte roh", density: 650 }, { name: "MDF", density: 750 },
+    { name: "Multiplex (Birke)", density: 680 }, { name: "OSB", density: 600 },
+    { name: "Glas (Float)", density: 2500 }, { name: "Acrylglas (PMMA)", density: 1180 },
+    { name: "Stahl", density: 7850 }, { name: "Aluminium", density: 2700 },
+    { name: "Beton", density: 2400 }, { name: "Naturstein (Granit)", density: 2700 },
+    { name: "Massivholz Fichte", density: 470 }, { name: "Massivholz Eiche", density: 720 }
+  ].sort((a,b) => a.name.localeCompare(b.name));
+
+  let state = { title: "", notes: "", rows: [] };
+
+  const createDefaultRow = () => ({
+    id: Math.random().toString(36).substr(2, 9),
+    mat: "Spanplatte roh", mode: "dims", l: "", b: "", d: "", area: "", dia: "", idia: "", densOver: "", qty: 1
+  });
+
+  const calcWeight = (r) => {
+    const val = (v) => parseFloat(v) || 0;
+    const mmM = (v) => val(v) / 1000;
+    const dens = val(r.densOver) || MATERIALS_DB.find(m => m.name === r.mat)?.density || 0;
+    let vol = 0;
+    if (r.mode === "dims") vol = mmM(r.l) * mmM(r.b) * mmM(r.d);
+    else if (r.mode === "area") vol = val(r.area) * mmM(r.d);
+    else if (r.mode === "cyl") vol = Math.PI * Math.pow(mmM(r.dia)/2, 2) * mmM(r.l);
+    else if (r.mode === "tube") vol = Math.PI * (Math.pow(mmM(r.dia)/2, 2) - Math.pow(mmM(r.idia)/2, 2)) * mmM(r.l);
+    return vol * dens * val(r.qty);
+  };
+
+  const updateGlobalSum = () => {
+    const total = state.rows.reduce((sum, r) => sum + calcWeight(r), 0);
+    document.getElementById("totalKg").textContent = total.toLocaleString('de-DE', {minimumFractionDigits:2}) + " kg";
+  };
+
+  const save = () => localStorage.setItem('nowoline_calc_v_final_stable', JSON.stringify(state));
+
+  window.updateMeta = () => {
+    state.title = document.getElementById("projectTitle").value;
+    state.notes = document.getElementById("projectNotes").value;
+    save();
+  };
+
+  window.updateVal = (id, key, val) => {
+    const idx = state.rows.findIndex(r => r.id === id);
+    if (idx === -1) return;
+
+    // Fix: Bei Moduswechsel Werte säubern
+    if (key === 'mode') {
+        state.rows[idx].l = ""; state.rows[idx].b = ""; state.rows[idx].d = "";
+        state.rows[idx].area = ""; state.rows[idx].dia = ""; state.rows[idx].idia = "";
+    }
+
+    state.rows[idx][key] = val;
+    
+    // UI sofort aktualisieren
+    if (key === 'mode' || key === 'mat') {
+        fullRender();
+    } else {
+        const weightCell = document.getElementById(`weight-${id}`);
+        if (weightCell) weightCell.textContent = calcWeight(state.rows[idx]).toLocaleString('de-DE', {minimumFractionDigits:2}) + " kg";
+        updateGlobalSum();
+    }
+    save();
+  };
+
+  const fullRender = () => {
+    document.getElementById("projectTitle").value = state.title || "";
+    document.getElementById("projectNotes").value = state.notes || "";
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+    state.rows.forEach((r) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="Material"><select onchange="updateVal('${r.id}', 'mat', this.value)">${MATERIALS_DB.map(m => `<option ${r.mat === m.name ? 'selected' : ''}>${m.name}</option>`).join('')}</select></td>
+        <td data-label="Form"><select onchange="updateVal('${r.id}', 'mode', this.value)">
+          <option value="dims" ${r.mode==='dims'?'selected':''}>Rechteck</option>
+          <option value="area" ${r.mode==='area'?'selected':''}>Fläche (m²)</option>
+          <option value="cyl" ${r.mode==='cyl'?'selected':''}>Rundstab</option>
+          <option value="tube" ${r.mode==='tube'?'selected':''}>Rohr</option>
+        </select></td>
+        <td data-label="Eingabe"><div class="rowgrid">
+          ${r.mode === 'dims' ? `
+            <input type="number" value="${r.l}" oninput="updateVal('${r.id}', 'l', this.value)" placeholder="L (mm)">
+            <input type="number" value="${r.b}" oninput="updateVal('${r.id}', 'b', this.value)" placeholder="B (mm)">
+            <input type="number" value="${r.d}" oninput="updateVal('${r.id}', 'd', this.value)" placeholder="D (mm)">` : 
+            r.mode === 'area' ? `
+            <input type="number" value="${r.area}" oninput="updateVal('${r.id}', 'area', this.value)" placeholder="Fläche m²">
+            <input type="number" value="${r.d}" oninput="updateVal('${r.id}', 'd', this.value)" placeholder="Dicke mm">` : 
+            r.mode === 'cyl' ? `
+            <input type="number" value="${r.dia}" oninput="updateVal('${r.id}', 'dia', this.value)" placeholder="Ø (mm)">
+            <input type="number" value="${r.l}" oninput="updateVal('${r.id}', 'l', this.value)" placeholder="Länge (mm)">` : `
+            <input type="number" value="${r.dia}" oninput="updateVal('${r.id}', 'dia', this.value)" placeholder="Ø Aussen">
+            <input type="number" value="${r.idia}" oninput="updateVal('${r.id}', 'idia', this.value)" placeholder="Ø Innen">
+            <input type="number" value="${r.l}" oninput="updateVal('${r.id}', 'l', this.value)" placeholder="Länge">`}
+        </div></td>
+        <td data-label="Dichte"><input type="number" value="${r.densOver}" placeholder="${MATERIALS_DB.find(m=>m.name===r.mat).density}" oninput="updateVal('${r.id}', 'densOver', this.value)"></td>
+        <td data-label="Stk"><input type="number" value="${r.qty}" oninput="updateVal('${r.id}', 'qty', this.value)"></td>
+        <td data-label="Gewicht" class="weight-cell" id="weight-${r.id}">${calcWeight(r).toLocaleString('de-DE', {minimumFractionDigits:2})} kg</td>
+        <td><button onclick="removeRow('${r.id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.2rem">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    updateGlobalSum();
+  };
+
+  window.removeRow = (id) => {
+    state.rows = state.rows.filter(r => r.id !== id);
+    if(state.rows.length === 0) state.rows.push(createDefaultRow());
+    fullRender(); save();
+  };
+
+  document.getElementById("btnAdd").onclick = () => { state.rows.push(createDefaultRow()); fullRender(); save(); };
+  document.getElementById("btnReset").onclick = () => { if(confirm("Projekt komplett löschen?")) { state = { title: "", notes: "", rows: [createDefaultRow()] }; fullRender(); save(); } };
+
+  document.getElementById("btnExportTxt").onclick = () => {
+    let t = `PLATTEN-GEWICHTSRECHNER\n`;
+    t += `PROJEKT: ${state.title || 'Unbenannt'}\n\n`;
+    state.rows.forEach((r, i) => t += `POS ${i+1}: ${r.mat} | ${calcWeight(r).toLocaleString('de-DE', {minimumFractionDigits:2})} kg\n`);
+    t += `\nGESAMTGEWICHT: ${document.getElementById("totalKg").textContent}\n\nPlatten-Gewichtsrechner 2.0 | Sponsored by Nowoline GmbH | Alle Angaben ohne Gewähr`;
+    const b = new Blob([t], {type : 'text/plain'});
+    const a = document.createElement('a');
+    a.href = window.URL.createObjectURL(b);
+    a.download = `Gewicht_Export.txt`; a.click();
+  };
+
+  const saved = localStorage.getItem('nowoline_calc_v_final_stable');
+  if (saved) state = JSON.parse(saved);
+  else state.rows = [createDefaultRow()];
+  fullRender();
+})();
+</script>
+</body>
+</html>
